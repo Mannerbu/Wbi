@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			body{
+				margin: 0 auto;
+			}
+			li{list-style:none;}
+			#box{
+				width: 1200px;
+				height: 40px;
+				margin: 0 auto;
+				background-color: orange;
+			}	
+		     .nav-top .banner {
+		    	margin: 0 auto;
+		    	width: 85px;
+		    	text-align: center;
+		      	float: left;
+		     	list-style: none;
+		      	margin-right: 10px;
+		     	background-color: orange;
+		      	padding: 10px;
+		      	color: indianred;	      	
+		    }
+		    a {
+		      text-decoration: none;
+		      color: royalblue;
+		    }
+		    a:hover {
+		      text-decoration: underline;
+		    }
+		    h2{
+		    	margin:70px auto;
+		    	border: 1px solid orangered;
+		    	width: 150px;
+		    	text-align: center;	    	
+		    }
+		    #box2{
+		    	width: 1000px;
+		    	height: 800px;
+		    	margin: 0 auto;
+		    }
+		    #box2 >.nav-buttom{
+		    	height: 800px;
+		    }
+		    #box2>.nav-buttom>.nav{
+		    	float: left;
+		    	width: 200px;
+		    	height: 400px;
+			    }
+			img{
+				width: 200px;
+				height: 200px;
+				
+				
+			}
+			span{
+				width: 200px;
+				float: left;
+				
+			}
+		  </style>
+	</head>
+	<body>
+		<div id="box">
+			<ul class="nav-top"></ul>
+		</div>
+		<div id="box2">
+			<ul class="nav-buttom"></ul>
+			
+		</div>
+		<script type="text/javascript" src="js/myajax.js" ></script>
+		<script>
+			var oDiv = document.querySelector('#box')
+			var oH2 = document.querySelector("h2");
+			var oUl = document.querySelector('.nav-top');
+			myajax.get("http://h6.duchengjiu.top/shop/api_cat.php",{},function(error,responseText) {
+				var json = JSON.parse(responseText);
+				var data = json.data;
+				for (var i = 0;i < data.length;i++) {
+					var obj = data[i];
+					oUl.innerHTML += '<li class="banner"><a href="#">' + obj.cat_name + '</a></li>';
+				}
+			});
+			myajax.get("http://h6.duchengjiu.top/shop/api_goods.php",{},function(error,responseText) {
+				var json = JSON.parse(responseText);
+				var oDiv2 = document.querySelector('#box2');
+				var oUl2 = document.querySelector('.nav-buttom');
+				var data = json.data;
+				for (var i = 0;i < data.length;i++) {
+					var obj = data[i];
+					//oUl2.innerHTML += '<li class="nav"><a href="#"><img src="obj.goods_thumb"/><span>' + obj.goods_name + '</span></a></li>';
+					oUl2.innerHTML += `<li><a href="#"><img src="${obj.goods_thumb}"><span>${obj.goods_name}</span></a></li>`
+				}
+			});
+			//把json字符串转换成对象
+			/*var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === xhr.DONE) {
+					//oH2.innerHTML = xhr.responseText;
+					
+					try{
+						var json = JSON.parse(xhr.responseText);
+						var data = json.data;
+						for (var i = 0;i < data.length;i++) {
+							var obj = data[i];
+							var oLi = document.createElement('li');
+							var oA = document.createElement('a');
+							oA.innerText = obj.cat_name;
+							oA.href = "#";
+							oLi.appendChild(oA);
+							oUl.appendChild(oLi);
+							
+							oUl.innerHTML += `<li><a href="#"><img src="${obj.goods_thumb}"/>${obj.cat_name}</a></li>`
+						}
+					}catch(e){
+						//TODO handle the exception
+					}
+				}
+			}
+			xhr.open("GET","http://h6.duchengjiu.top/shop/api_cat.php");
+			xhr.send();*/
+		</script>
+	</body>
+</html>
