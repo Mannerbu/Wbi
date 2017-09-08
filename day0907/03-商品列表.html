@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			#cat{
+				width: 1200px;
+				height: 50px;
+				margin: 0 auto;
+				background-color: orange;
+				text-align: center;
+			}
+			#cat li {
+				width: 110px;
+				line-height: 50px;
+				font-size: 20px;
+		      float: left;
+		      list-style: none;
+		      background-color: orange;
+		      color: white;
+		    }
+		    #hot-goods{
+		    	width: 1200px;
+		    	height: 700px;
+		    }
+		    #hot-goods li{
+		    	float: left;
+		    	list-style: none;
+		    	background-color: orange;
+		    	width: 230px;
+		    	height: 350px;
+		    }
+		 	#hot-goods li img{
+		  	width: 200px;
+		  	height: 200px;
+		  }
+		 	#hot-goods li p{
+		 	width:200px;
+		 }
+		</style>
+	</head>
+	<body>
+		<a href="01-显示热门商品.html">首页</a>
+		
+		<ul id="cat"></ul>
+		<script type="text/javascript" src="js/myajax.js" ></script>
+		<script>
+			var oCat = document.querySelector('#cat');
+			myajax.get('http://h6.duchengjiu.top/shop/api_cat.php',{}, function(error, responseText){
+			      var json = JSON.parse(responseText);//返回的整个json对象
+			      var data = json.data;//json对象当中的data是一个数组
+			      for (var i = 0; i < data.length; i++) {
+			        var obj = data[i];//数组里面的每一项是一个商品分类的对象
+			        oCat.innerHTML += `<li><a href="03-商品列表.html?cat_id=${obj.cat_id}">${obj.cat_name}</a></li>`;
+			      }
+			  });
+		</script>	
+		<ul id="hot-goods"></ul>
+		<script>
+			function getQueryString(name) {
+				var search = location.search.substr(1);
+				var reg = new RegExp("(^|&)"+name+"=([^&]*)(&|$)");
+				var result= search.match(reg);
+				if (result === null) return null;
+				return decodeURIComponent(result[2]);
+			}
+			var cat_id = getQueryString('cat_id');
+			var oGoods = document.querySelector('#hot-goods');
+			myajax.get("http://h6.duchengjiu.top/shop/api_goods.php?cat_id="+cat_id,{},function(error,responseText) {
+				var json = JSON.parse(responseText);
+				console.log(json);
+				var data = json.data;
+				for (var i = 0;i < data.length;i++) {
+					var obj = data[i];
+					oGoods.innerHTML += `<li>
+						<div><img src="${obj.goods_thumb}"/></div>
+						<p>${obj.goods_name}</p>
+						<p>${obj.goods_desc}</p>
+						<p>${obj.price}</p>
+					</li>`;
+				}
+			});
+		</script>
+	</body>
+</html>
