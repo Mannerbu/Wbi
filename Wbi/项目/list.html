@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="css/animate.css" />
+		<link rel="stylesheet" href="css/reset.css" />
+		<style>
+			body{
+				margin: 0 auto;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="header">
+			<img src="img/TB16.jpg"/>
+		</div>
+		<div id="nav">
+			<span>欢迎来到一淘网，阿里巴巴旗下生活省钱利器！</span>
+			<p><a href="register.html">免费注册</a></p>
+			<p><a href="login.html">登录</a></p>
+			<p><a href="cart.html">购物车</a></p>
+			<p><a href="list.html">热门商品</a></p>
+			<p><a href="order.html">我的订单</a></p>
+			<p><a href="#" name="username" class="username">asdfghjkl1</a></p>
+			<p><a href="javascript:localStorage.clear(); location.reload();" class="logout">退出</a></p>
+		</div>
+		<div id="box">
+			<p><img src="img/TB1320.png" style="float: right"/></p>
+			<a href="index.html"><img src="img/T-220.png"/></a>
+			<div class="box2">
+				<input type="button" id="search-one" value="搜索" />
+				<input id="search" type="text" placeholder="请输入要搜索的内容">
+				<ul>
+				<li><a href="#">手机</a></li>
+				<li><a href="#">棒球服</a></li>
+				<li><a href="#">妈妈装</a></li>
+				<li><a href="#">假两件</a></li>
+				<li><a href="#">女外搭</a></li>
+				<li><a href="#">雪纺衬衫</a></li>
+				<li><a href="#">老年手机</a></li>
+				<li><a href="#">女开衫</a></li>
+				<li><a href="#">长袖衬衫</a></li>
+				<li><a href="#">毛针长衫</a></li>
+			</ul>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/myajax.js" ></script>
+		 <script>
+      //判断用户名如果存在, 则显示用户名并显示退出按钮, 否则显示注册和登录
+      if (localStorage.username) {
+        var oUsername = document.querySelector('a[name=username]');
+        var oLogout = document.querySelector('.logout');
+        oUsername.innerText = localStorage.username;
+        oUsername.style.display = 'inline';
+        oLogout.style.display = 'inline';
+      } else {
+        var oRegister = document.querySelector('.register');
+        var oLogin = document.querySelector('.login');
+        oRegister.style.display = 'inline';
+        oLogin.style.display = 'inline';
+      }
+    </script>
+    <script>
+      var oSearch = document.querySelector("#search");
+	    var oBtn = document.querySelector('button');
+	    var sub=document.querySelector('#search-one');
+	    
+	    oSearch.onkeyup =function(event) {
+	      if (event.keyCode === 13) {
+	        location.href = 'search.html?search_text='+this.value;
+	      }
+	      var self=this;
+	      sub.onclick=function(){
+	      	 location.href = 'search.html?search_text='+self.value;
+	    }
+	    }
+    </script>
+
+    <ul id="cat" class="cat"></ul>
+    <script>
+    var oCat = document.querySelector('#cat');
+    myajax.get('http://h6.duchengjiu.top/shop/api_cat.php', {}, function(error, responseText){
+        var json = JSON.parse(responseText);//返回的整个json对象
+        var data = json.data;//json对象当中的data是一个数组
+        for (var i = 0; i < data.length; i++) {
+          var obj = data[i];//数组里面的每一项是一个商品分类的对象
+          oCat.innerHTML += `<li><a href="list.html?cat_id=${obj.cat_id}">${obj.cat_name}</a></li>`;
+        }
+    });
+    </script>
+
+  <main>
+    <ul id="hot-goods">
+    </ul>
+  </main>
+  <script>
+    //name abc
+    //123
+
+    var cat_id = getQueryString('cat_id');
+
+    var oGoods = document.querySelector('#hot-goods');
+    myajax.get('http://h6.duchengjiu.top/shop/api_goods.php',
+    {cat_id: cat_id},
+    (err,responseText) => {
+      var json = JSON.parse(responseText);
+      console.log(json);
+      var data = json.data;
+      //判断如果没有数据，则显示空的提示
+      if (data.length === 0) {
+        oGoods.innerHTML = "<center>后端程序员跑路了</center>";
+        return;
+      }
+      for (var i = 0; i < data.length; i++) {
+        var obj = data[i];
+        oGoods.innerHTML += `<li class="goods"><a href="goods.html?goods_id=${obj.goods_id}">
+          <div><img src="${obj.goods_thumb}" /></div>
+          <div>${obj.goods_name}</div>
+          <div>${obj.price}</div></a>
+        </li>`;
+      }
+    });
+  </script>
+  <div id="footer">
+	  	<dl style="margin-left: 150px;">
+	  		<dt>关于我们</dt>
+	  		<dd><a href="#">关于一淘</a></dd>
+	  		<dd><a href="#">法律声明</a></dd>
+	  		<dd><a href="#">诚聘英才</a></dd>
+	  		<dd><a href="#">廉政邮箱</a></dd>
+	  	</dl>
+	  	<dl>
+	  		<dt>帮助中心</dt>
+	  		<dd><a href="#">新手指南</a></dd>
+	  		<dd><a href="#">关于返利</a></dd>
+	  		<dd><a href="#">关于集分宝</a></dd>
+	  		<dd><a href="#">关于会员 特权</a></dd>
+	  		<dd><a href="#">联系客户</a></dd>
+	  	</dl>
+	  	<dl>
+	  		<dt>手机一淘</dt>
+	  		<dd><a href="#"><img src="img/TB3.png"/></a></dd>
+	  	</dl>
+	  	<dl>
+	  		<dt>优惠地图</dt>
+	  		<dd><a href="#">品牌特惠</a></dd>
+	  		<dd><a href="#">限时闪购</a></dd>
+	  	</dl>
+	  	<dl>
+	  		<dt>商家合作</dt>
+	  		<dd><a href="#">报名入口</a></dd>
+	  		<dd><a href="#">商家端问题</a></dd>
+	  	</dl>
+	  	<div class="foot">
+	  		<ul>
+	  			<li><a href="#">阿里巴巴集团</a></li>
+	  			<li><a href="#">淘宝网</a></li>
+	  			<li><a href="#">天猫</a></li>
+	  			<li><a href="#">全球速卖通</a></li>
+	  			<li><a href="#">阿里巴巴国际交易市场</a></li>
+	  			<li><a href="#">1688</a></li>
+	  			<li><a href="#">阿里妈妈</a></li>
+	  			<li><a href="#">阿里旅行▪去吧</a></li>
+	  			<li><a href="#">阿里云计算</a></li>
+	  			<li><a href="#">YunOS</a></li>
+	  			<li><a href="#">阿里通信</a></li>
+	  			<li><a href="#">万网</a></li>
+	  			<li><a href="#">高德</a></li>
+	  			<li><a href="#">优视</a></li>
+	  			<li><a href="#">友盟</a></li>
+	  			<li><a href="#">酷盘</a></li>
+	  			<li><a href="#">虾米</a></li>
+	  			<li><a href="#">天天动听</a></li>
+	  			<li><a href="#">来往</a></li>
+	  			<li><a href="#">钉钉</a></li>
+	  			<li><a href="#">11 Main</a></li>
+	  			<li><a href="#">虾支付宝</a></li>
+	  		</ul>
+	  		<div class="foot-foot">
+	  			<p>Copyright © 2010-2017 ETAO.COM 版权所有</p>
+	  			<p>增值电信业务经营许可证：浙B2-20080224</p>
+	  		</div>
+	  		
+	  	</div>
+	  </div>
+	</body>
+</html>

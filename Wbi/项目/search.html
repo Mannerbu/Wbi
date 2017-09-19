@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/animate.css" />
+		<style>	
+		</style>
+	</head>
+	<body>
+		<div id="header">
+			<img src="img/TB16.jpg"/>
+		</div>
+		<div id="nav">
+			<span>欢迎来到一淘网，阿里巴巴旗下生活省钱利器！</span>
+			<p><a href="register.html">免费注册</a></p>
+			<p><a href="login.html">登录</a></p>
+			<p><a href="cart.html">购物车</a></p>
+			<p><a href="list.html">热门商品</a></p>
+			<p><a href="order.html">我的订单</a></p>
+			<p><a href="#" name="username" class="username">asdfghjkl1</a></p>
+			<p><a href="javascript:localStorage.clear(); location.reload();" class="logout">退出</a></p>
+		</div>
+		<div id="box">
+			<p><img src="img/TB1320.png" style="float: right"/></p>
+			<img src="img/T-220.png"  class="index.html"/>
+			<div class="box2">
+				<input type="button" id="search-one" value="搜索">				
+				<input id="search" type="text" placeholder="请输入要搜索的内容">
+				<ul>
+				<li><a href="#">手机</a></li>
+				<li><a href="#">棒球服</a></li>
+				<li><a href="#">妈妈装</a></li>
+				<li><a href="#">假两件</a></li>
+				<li><a href="#">女外搭</a></li>
+				<li><a href="#">雪纺衬衫</a></li>
+				<li><a href="#">老年手机</a></li>
+				<li><a href="#">女开衫</a></li>
+				<li><a href="#">长袖衬衫</a></li>
+				<li><a href="#">毛针长衫</a></li>
+			</ul>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/myajax.js" ></script>
+		
+		<script>
+			function getQueryString(name) {
+				var search = location.search.substr(1);
+				var reg = new RegExp("(^|&)"+name+"=([^&]*)(&|$)");
+				var result= search.match(reg);
+				if (result === null) return null;
+				return decodeURIComponent(result[2]);
+			}
+			if (localStorage.username) {
+		        var oUsername = document.querySelector('a[name=username]');
+		        var oLogout = document.querySelector('.logout');
+		        oUsername.innerText = localStorage.username;
+		        oUsername.style.display = 'inline';
+		        oLogout.style.display = 'inline';
+		      } else {
+		        var oRegister = document.querySelector('.register');
+		        var oLogin = document.querySelector('.login');
+		        oRegister.style.display = 'inline';
+		        oLogin.style.display = 'inline';
+		      }
+		</script>		
+	  <script>
+	    var oSearch = document.querySelector("#search");
+	    var oBtn = document.querySelector('button');
+	    var sub=document.querySelector('#search-one');
+	    
+	    oSearch.onkeyup =function(event) {
+	      if (event.keyCode === 13) {
+	        location.href = 'search.html?search_text='+this.value;
+	      }
+	      var self=this;
+	      sub.onclick=function(){
+	      	 location.href = 'search.html?search_text='+self.value;
+	    }
+	    }
+	  </script>
+		<main>
+	  <ul id="cat" class="cat"></ul>
+	  </main>
+	  <script>
+	  var oCat = document.querySelector('#cat');
+	  myajax.get('http://h6.duchengjiu.top/shop/api_cat.php', {}, function(error, responseText){
+	      var json = JSON.parse(responseText);//返回的整个json对象
+	      var data = json.data;//json对象当中的data是一个数组
+	      for (var i = 0; i < data.length; i++) {
+	        var obj = data[i];//数组里面的每一项是一个商品分类的对象
+	        oCat.innerHTML += `<li><a href="list.html?cat_id=${obj.cat_id}">${obj.cat_name}</a></li>`;
+	      }
+	  });
+	  </script>
+	  <main>
+    <ul id="hot-goods"></ul>	    
+	  </main>
+	  <script>
+    var search_text = getQueryString('search_text');
+    //name abc
+    //123
+    var oGoods = document.querySelector('#hot-goods');
+    myajax.get('http://h6.duchengjiu.top/shop/api_goods.php',
+    {search_text: search_text},
+    function(err,responseText){
+      var json = JSON.parse(responseText);
+      console.log(json);
+      var data = json.data;
+      //如果没数据要给出提示
+      if (data.length === 0) {
+        oGoods.innerHTML = "未搜索到商品, <span id='second'>10</span>秒后跳回首页";
+        var oSecond = oGoods.querySelector('#second');
+        var timer = setInterval(() => {
+          var second = parseInt(oSecond.innerText);
+          oSecond.innerText = --second;
+        }, 1000);
+        setTimeout(() => {
+          clearInterval(timer);
+          location.href = '/';
+        }, 10000);
+        return;
+      }
+      for (var i = 0; i < data.length; i++) {
+        var obj = data[i];
+        oGoods.innerHTML += `<li class="goods"><a href="goods.html?goods_id=${obj.goods_id}">
+          <div><img src="${obj.goods_thumb}" /></div>
+          <div>${obj.goods_name}</div>
+          <div>${obj.price}</div></a>
+        </li>`;
+      }
+    });
+	  /* 	var goods_id = getQueryString('goods_id');
+	    console.log(goods_id);
+	    myajax.get('http://h6.duchengjiu.top/shop/api_goods.php', {
+	      // goods_id: goods_id ES5
+	      goods_id //ES6
+	    }, function(err, responseText){
+	      var json = JSON.parse(responseText);
+	      var obj = json.data[0];
+	      console.log(json);
+	      document.body.innerHTML = `<div>
+	        <div><img src="${obj.goods_thumb}"></div>
+	        <p>${obj.goods_name}</p>
+	        <p>${obj.price}</p>
+	        <p><input type="button" id="add-to-cart" value="添加到购物车"></div>
+	      </p>`;      
+	    });	
+	    document.body.onclick = function(event) {
+	      event = event || window.event;
+	      var target = event.target || event.srcElement;
+	      if (target.id === 'add-to-cart') {
+	        console.log('添加到购物车');
+	        myajax.post('http://h6.duchengjiu.top/shop/api_cart.php?token='+localStorage.token,
+	        {goods_id, number:1},
+	        function(err, responseText) {
+	          var json = JSON.parse(responseText);
+	          console.log(json);
+	          if (json.code === 0) {
+	            alert('添加到购物车成功');
+	          }
+	        })
+	      }
+	    }*/
+  		</script>
+	</body>
+</html>
