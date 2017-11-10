@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="node_modules/todomvc-app-css/index.css"/>
+	</head>
+	<body>
+		<section class="todoapp">
+			<header class="header">
+				<h1>土豆做事网</h1>
+				<input class="new-todo" placeholder="你将要做什么 " autofocus="" v-model="newTodo" @keyup.enter.trim="addTodo"> 
+			</header>
+			<section class="main" v-show="showList">
+				<input class="toggle-all" id="toggle-all" type="checkbox" v-model="allDone" >
+				<label for="toggle-all">一键完成所有标记{{doneState}}</label>
+				<ul class="todo-list">
+					<li :class="{completed: todo.checked, editing: index === editingIndex}" v-for="(todo,index) in filteredTodoList" :key="'todo-'+index">
+						<div class="view">
+							<input class="toggle" type="checkbox" v-model="todo.checked">
+							<label @dblclick="editTodo(index)">{{ todo.text }}</label>
+							<button class="destroy" @click="deleteTodo(todo)"></button>
+						</div>
+						<input class="edit" type="text" v-model="todo.text" v-focus="index === editingIndex"
+							@blur="saveTodo(todo)" @keyup.enter="saveTodo(todo)">
+					</li>
+				</ul>
+			</section>
+			<footer class="footer" v-show="showList">
+			<span class="todo-count"><strong>{{activeCount}}</strong> 未完成</span>
+			<ul class="filters">
+				<li>
+					<a :class="{selected: visibility ==='all'}" href="#/" @click="visibility='all'">所有</a>
+				</li>
+				<li>
+					<a :class="{selected: visibility === 'active'}" href="#/active" @click="visibility = 'active'">未完成</a>
+				</li> 
+				<li>
+					<a :class="{selected: visibility === 'completed'}" href="#/completed" @click="visibility='completed'">已完成</a>
+				</li>
+			</ul>
+			
+			<button class="clear-completed" @click="clearCompleted" v-show="completedCount > 0">清空已完成</button>
+			
+		</footer>
+		</section>
+		<script type="text/javascript" src="./node_modules/vue/dist/vue.js" ></script>
+		<script src="./node_modules/underscore/underscore-min.js"></script>
+		<script src="./js/store.js" charset="utf-8"></script>
+		<script>
+			// 注册一个全局自定义指令 v-focus
+			Vue.directive('focus', {
+			  // 当绑定元素插入到 DOM 中。
+			  inserted(el) {
+			    // 聚焦元素
+			    el.focus()
+			  },
+			  update(el) {
+			  	el.focus();
+			  }
+			})
+			var filters = {
+				all: function (todos) {
+					return todos;
+				},
+				active: function (todos) {
+					return todos.filter(function (todo) {
+						return !todo.checked;
+					});
+				},
+				completed: function (todos) {
+					return todos.filter(function (todo) {
+						return todo.checked;
+					});
+				}
+			};
+			var visibility = location.hash.substr(location.hash.indexOf('/')+1);
+			visibility = visibility === '' ? 'all' : visibility
+			var todoapp = new Vue({
+				//挂载
+				el:'.todoapp',
+				//数据
+				data: {
+					visibility: visibility,
+					doneState:false,
+					editingIndex: -1,
+					//新的备忘录
+					newTodo: '',
+					todoList:todoStorage.fetch()
+				},
+				watch: {
+					todoList:{
+						deep:true,
+						handler:todoStorage.save
+					},
+					doneState:{
+						handler() {
+							this.todoList.map(todo => {
+								  todo.checked = this.doneState
+							})
+						}
+					}
+				},
+				//方法
+				methods: {
+					addTodo() {
+						this.newTodo = this.newTodo.trim();
+						if(this.newTodo.length < 1) {
+							return;
+						}
+						this.todoList.unshift({
+							text:this.newTodo,
+							checked:false
+						});
+						this.newTodo =""
+					},
+					deleteTodo(todo) {
+						this.todoList = _.without(this.todoList,todo)
+					},
+					editTodo(index) {
+						this.editingIndex = index;
+					},
+					saveTodo(todo) {
+						this.editingIndex = -1
+						if(todo.text.trim().length < 1) {
+							this.deleteTodo(todo)
+						}
+					},
+					clearCompleted() {
+						this.todoList = filters.active(this.todoList);
+					}
+				},
+				//计算属性
+				computed:{
+					showList() {
+						return this.todoList.length > 0;
+					},
+					activeCount() {
+						return filters.active(this.todoList).length;
+					},
+					completedCount() {
+						return filters.completed(this.todoList).length;
+					},
+					allDone: {
+						get() {
+							return this.activeCount === 0;
+						},
+						set(value) {
+							this.todoList.forEach(todo => {
+								todo.checked = value
+							});
+						}
+					},
+					filteredTodoList: function () {
+						return filters[this.visibility](this.todoList);
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
+ 
